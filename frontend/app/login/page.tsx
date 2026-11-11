@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Link2, Eye, EyeOff, Lock, Mail, ArrowRight, AlertCircle } from "lucide-react";
+import { Link2, Eye, EyeOff, Lock, Mail, ArrowRight, AlertCircle, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
 export default function LoginPage() {
@@ -30,6 +30,19 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setEmail("demo@linkflow.local");
+    setPassword("Demo12345!");
+    setErrorMsg(null);
+    setIsLoading(true);
+    try {
+      await login("demo@linkflow.local", "Demo12345!", true);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to sign in with demo credentials. Please check backend connection.");
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 pb-16 relative">
       {/* Background glow */}
@@ -52,6 +65,26 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-slate-400">
             Sign in to manage your short links and track their performance.
           </p>
+        </div>
+
+        {/* One-Click Demo Login Banner */}
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-brand-950/70 via-indigo-950/40 to-slate-900 border border-brand-500/30 flex items-center justify-between gap-3 text-left">
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-white flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-brand-400 shrink-0" />
+              <span>Instant Demo Access</span>
+            </p>
+            <p className="text-[11px] text-slate-400 truncate">Pre-verified test account with sample analytics</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md transition-all shrink-0 flex items-center gap-1 disabled:opacity-50"
+          >
+            <span>Demo Login</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         {/* Error Alert */}

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Link2, Eye, EyeOff, Lock, Mail, User, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
+import { api } from "@/lib/api";
 
 export default function SignUpPage() {
   const [fullName, setFullName] = useState("");
@@ -15,8 +16,22 @@ export default function SignUpPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successInfo, setSuccessInfo] = useState<{ message: string; devToken?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  const { register } = useAuth();
+  const { register, login } = useAuth();
+
+  const handleInstantVerifyAndLogin = async () => {
+    if (!successInfo?.devToken) return;
+    setIsVerifying(true);
+    try {
+      await api.verifyEmail(successInfo.devToken);
+      await login(email.trim(), password);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Auto-verification failed. Please log in manually.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,16 +103,26 @@ export default function SignUpPage() {
             </div>
 
             {successInfo.devToken && (
-              <div className="mt-3 p-3 bg-slate-900/90 rounded-xl border border-emerald-800/40 text-xs">
-                <p className="font-semibold text-brand-300 mb-1">Local Development Quick-Verify:</p>
-                <p className="text-slate-400 mb-2">No external SMTP was detected. You can verify immediately:</p>
-                <Link
-                  href={`/verify-email?token=${encodeURIComponent(successInfo.devToken)}`}
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium hover:bg-brand-500 transition-colors"
+              <div className="mt-3 p-4 bg-slate-900/90 rounded-2xl border border-emerald-800/40 text-xs space-y-3">
+                <div>
+                  <p className="font-semibold text-brand-300">Quick Verification Available:</p>
+                  <p className="text-slate-400 text-[11px] mt-0.5">Click below to automatically verify and sign in immediately.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleInstantVerifyAndLogin}
+                  disabled={isVerifying}
+                  className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-md transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
                 >
-                  <span>Click to Complete Verification</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                  {isVerifying ? (
+                    <span>Verifying and signing you in...</span>
+                  ) : (
+                    <>
+                      <span>Verify & Go Directly to Dashboard</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
               </div>
             )}
 

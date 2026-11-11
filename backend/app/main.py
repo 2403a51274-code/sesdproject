@@ -30,6 +30,16 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database schema...")
     Base.metadata.create_all(bind=engine)
     logger.info("Database schema verified.")
+    
+    # Auto-seed verified demo user & sample analytics if not present
+    from app.database.session import SessionLocal
+    from app.database.seed import seed_demo_data_if_empty
+    try:
+        with SessionLocal() as db:
+            seed_demo_data_if_empty(db)
+    except Exception as exc:
+        logger.warning("Could not auto-seed demo data: %s", exc)
+    
     yield
 
 
@@ -43,10 +53,11 @@ app = FastAPI(
     openapi_url="/openapi.json"
 )
 
-# CORS Configuration
+# CORS Configuration - supports configured origins + any Vercel/Render preview domains
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

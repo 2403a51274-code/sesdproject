@@ -9,10 +9,26 @@ LinkFlow is a high-performance, full-stack URL shortening and analytics platform
 - **High-Performance Redirection**: Sub-millisecond redirects with 301 (Permanent) and 302 (Temporary) support.
 - **Custom Aliases & Expiration**: Create branded short links with custom slugs and optional auto-expiration timestamps.
 - **Rich Analytics & Telemetry**: 14-day aggregate click telemetry, daily breakdown, referrers, and browser/device metadata tracking.
-- **Complete Auth Portal**: Registration, JWT session cookie login, email verification, password reset, and user dashboard.
+- **Working Authentication Portal**: 
+  - **Instant 1-Click Demo Login** pre-seeded with sample links and analytics.
+  - User registration with instant auto-verification (when SMTP is not configured).
+  - Secure JWT session cookie login, password recovery, and authenticated dashboard access.
 - **Cloud Database Ready**: Native integration with Neon Lakebase Postgres (Serverless PostgreSQL).
 - **Graceful Cache-Aside Architecture**: Optional Redis caching with seamless fallback to Postgres.
 - **One-Click Local Launcher**: Single `server.bat` script launches both backend and frontend automatically.
+
+---
+
+## 🔑 Demo Account Credentials
+
+A pre-verified demo user with sample short links and click telemetry is pre-seeded in the database:
+
+| Field | Value |
+|---|---|
+| **Email** | `demo@linkflow.local` |
+| **Password** | `Demo12345!` |
+
+> 💡 **Tip**: On the Login page (`/login`), simply click the **"Demo Login"** button for instant one-click access!
 
 ---
 
@@ -24,14 +40,14 @@ SESD-project/
 │   ├── app/
 │   │   ├── api/                # API Endpoints (v1: auth, urls, analytics)
 │   │   ├── core/               # Configuration, security (bcrypt/JWT), Redis client
-│   │   ├── database/           # SQLAlchemy session and engine management
+│   │   ├── database/           # SQLAlchemy session, engine & auto-seeder
 │   │   ├── models/             # ORM models (User, URL, ClickEvent, etc.)
 │   │   ├── schemas/            # Pydantic request/response schemas
 │   │   └── services/           # Business logic (URL hashing, analytics, email)
 │   ├── migrations/             # Alembic database migrations
 │   ├── tests/                  # Pytest test suite (25/25 passing)
-│   ├── alembic.ini             # Alembic configuration
-│   ├── pytest.ini              # Pytest configuration
+│   ├── Dockerfile              # Container definition for cloud deployment
+│   ├── Procfile                # Web process launcher for Render / Railway
 │   ├── requirements.txt        # Python backend dependencies
 │   └── .env.example            # Backend environment template
 │
@@ -45,8 +61,10 @@ SESD-project/
 │   ├── context/                # AuthContext & session management
 │   ├── lib/                    # API client (lib/api.ts) and utilities
 │   ├── package.json            # Frontend npm configuration
+│   ├── vercel.json             # Vercel deployment configuration
 │   └── .env.example            # Frontend environment template
 │
+├── render.yaml                 # Render Blueprint for 1-click backend deployment
 ├── server.bat                  # One-click Windows development launcher
 ├── .env.example                # Unified environment variables template
 ├── .gitignore                  # Git ignore rules (secrets, DBs, caches)
@@ -56,14 +74,14 @@ SESD-project/
 
 ---
 
-## 🚀 Quick Start (Windows)
+## 🚀 Quick Start (Local Windows)
 
 The easiest way to start both servers is using the provided `server.bat` launcher:
 
-1. **Clone or pull the repository**:
+1. **Clone the repository**:
    ```bash
-   git clone <repo-url>
-   cd SESD-project
+   git clone https://github.com/2403a51274-code/sesdproject.git
+   cd sesdproject
    ```
 
 2. **Set up your environment variables**:
@@ -83,54 +101,64 @@ The easiest way to start both servers is using the provided `server.bat` launche
 
 ---
 
-## 🛠️ Manual Setup
+## ☁️ 100% Free Cloud Deployment Guide
 
-### 1. Backend Setup (FastAPI)
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate          # On Linux/macOS: source venv/bin/activate
-pip install -r requirements.txt
+This project is architected for zero-cost hosting using industry standard free tiers:
 
-# Run database migrations
-alembic upgrade head
-
-# Run tests
-pytest
-
-# Start backend server
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```mermaid
+flowchart LR
+  A["GitHub Repository\n(sesdproject)"] --> B["Vercel\n(Next.js Frontend)\nFree Tier"]
+  A --> C["Render\n(FastAPI Backend)\nFree Tier"]
+  C --> D["Neon PostgreSQL\n(Serverless DB)\nFree Tier"]
+  B -->|"NEXT_PUBLIC_API_URL"| C
 ```
 
-### 2. Frontend Setup (Next.js)
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### Step 1: Database (Neon PostgreSQL) — Free Forever
+*(Already configured if using the repository's `.env.local`)*
+1. Go to [neon.tech](https://neon.tech) and create a free account.
+2. Create a project (e.g. `linkflow-db`).
+3. Copy the **Connection String** (`DATABASE_URL`).
 
 ---
 
-## 🔑 Environment Configuration
-
-Copy `.env.example` to `.env.local`:
-
-| Variable | Description | Default / Example |
-|---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host/db?sslmode=require` |
-| `DATABASE_URL_UNPOOLED` | Direct unpooled connection for migrations | `postgresql://user:pass@host/db?sslmode=require` |
-| `JWT_SECRET_KEY` | Secret key for JWT session tokens (min 32 chars) | `openssl rand -hex 32` |
-| `FRONTEND_URL` | Frontend origin for CORS and email links | `http://localhost:3000` |
-| `BACKEND_URL` | Backend origin for redirect routes | `http://localhost:8000` |
-| `NEXT_PUBLIC_API_URL` | API endpoint for frontend client calls | `http://localhost:8000` |
-| `REDIS_ENABLED` | Enable Redis cache (`true`/`false`) | `false` |
-| `ENVIRONMENT` | Environment (`development`/`production`) | `development` |
-
-> **Development Mode Note**: When SMTP is not configured, email verification tokens and password reset links are printed directly to the backend terminal log.
+### Step 2: Backend (Render) — 100% Free Web Service
+1. Sign up for free at [render.com](https://render.com).
+2. Click **New +** → **Web Service**.
+3. Connect your GitHub repository: `2403a51274-code/sesdproject`.
+4. Configure the service:
+   - **Name**: `linkflow-api`
+   - **Root Directory**: `backend`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt && alembic upgrade head`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Instance Type**: `Free`
+5. In **Environment Variables**, add:
+   - `DATABASE_URL`: *(Your pooled Neon connection string)*
+   - `DATABASE_URL_UNPOOLED`: *(Your direct Neon connection string)*
+   - `JWT_SECRET_KEY`: *(Generate any 64-char random string)*
+   - `ENVIRONMENT`: `production`
+   - `REDIS_ENABLED`: `false`
+   - `FRONTEND_URL`: `https://your-frontend.vercel.app` *(update after Step 3)*
+6. Click **Deploy Web Service**.
+7. Note down your backend URL (e.g. `https://linkflow-api.onrender.com`).
 
 ---
 
-## 📡 Key Endpoints
+### Step 3: Frontend (Vercel) — 100% Free Hobby Plan
+1. Sign up for free at [vercel.com](https://vercel.com).
+2. Click **Add New...** → **Project**.
+3. Import your GitHub repository: `2403a51274-code/sesdproject`.
+4. Configure the project:
+   - **Framework Preset**: `Next.js`
+   - **Root Directory**: Click edit and select `frontend`
+5. In **Environment Variables**, add:
+   - `NEXT_PUBLIC_API_URL`: `https://linkflow-api.onrender.com` *(from Step 2)*
+6. Click **Deploy**.
+7. In ~60 seconds, your site is live with a free SSL domain (e.g. `https://sesdproject.vercel.app`)!
+
+---
+
+## 📡 Key API Endpoints
 
 - **Web App**: `http://localhost:3000`
 - **Interactive Swagger Docs**: `http://localhost:8000/docs`
@@ -147,4 +175,3 @@ Copy `.env.example` to `.env.local`:
 - SQL injection prevention via SQLAlchemy 2.0 ORM parameterization.
 - HTTP-only and Secure JWT cookies with CSRF defense.
 - Sensitive environment files (`.env*`, `*.db`) are strictly excluded via `.gitignore`.
-
