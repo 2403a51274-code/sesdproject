@@ -14,6 +14,7 @@ import {
   Info,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import { getDisplayShortUrl } from "@/lib/utils";
 
 type RedirectType = 302 | 301;
 
@@ -70,7 +71,10 @@ export default function CreatePage() {
       if (form.expires_at) payload.expires_at = new Date(form.expires_at).toISOString();
 
       const result = await api.createUrl(payload);
-      setCreatedLink(result);
+      setCreatedLink({
+        ...result,
+        short_url: getDisplayShortUrl(result.short_code, result.short_url),
+      });
       setForm(DEFAULT_FORM);
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to create short link. Please try again.");

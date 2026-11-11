@@ -32,3 +32,10 @@ export function formatDateTime(dateString: string): string {
     return dateString;
   }
 }
+
+export function getDisplayShortUrl(shortCode: string, fallbackUrl?: string): string {
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return `${window.location.origin}/r/${shortCode}`;
+  }
+  return fallbackUrl || `/r/${shortCode}`;
+}

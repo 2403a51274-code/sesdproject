@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # Environment & URLs
     ENVIRONMENT: str = "development"
     FRONTEND_URL: str = "http://localhost:3000"
-    BACKEND_URL: str = "http://localhost:8000"
+    BACKEND_URL: str = "https://sesdproject-backend.onrender.com"
     
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [

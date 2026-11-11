@@ -70,3 +70,4 @@ def seed_demo_data_if_empty(db: Session) -> None:
     except Exception as e:
         logger.warning("Demo seeding skipped or already present: %s", e)
         db.rollback()
+

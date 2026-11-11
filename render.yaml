@@ -27,3 +27,4 @@ services:
         value: "https://your-frontend.vercel.app"
       - key: BACKEND_CORS_ORIGINS
         value: '["https://*.vercel.app","http://localhost:3000"]'
+

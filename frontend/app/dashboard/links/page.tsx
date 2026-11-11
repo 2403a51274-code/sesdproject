@@ -21,7 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { api } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getDisplayShortUrl } from "@/lib/utils";
 
 type SortBy = "created_at" | "clicks";
 type SortOrder = "desc" | "asc";
@@ -69,7 +69,11 @@ export default function LinksPage() {
       if (debouncedSearch) params.search = debouncedSearch;
       if (status !== "all") params.status = status;
       const data = await api.listUrls(params);
-      setLinks(data.items ?? []);
+      const items = (data.items ?? []).map((u: any) => ({
+        ...u,
+        short_url: getDisplayShortUrl(u.short_code, u.short_url),
+      }));
+      setLinks(items);
       setTotal(data.total ?? 0);
       setTotalPages(data.total_pages ?? 1);
     } catch (err: any) {

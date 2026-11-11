@@ -28,7 +28,7 @@ import {
 } from "recharts";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/auth-context";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, getDisplayShortUrl } from "@/lib/utils";
 
 export default function DashboardOverviewPage() {
   const { user } = useAuth();
@@ -69,7 +69,10 @@ export default function DashboardOverviewPage() {
         target = "https://" + target;
       }
       const res = await api.createUrl({ original_url: target });
-      setCreatedUrl(res);
+      setCreatedUrl({
+        ...res,
+        short_url: getDisplayShortUrl(res.short_code, res.short_url),
+      });
       setQuickUrl("");
       fetchOverview();
     } catch (err: any) {
@@ -328,7 +331,7 @@ export default function DashboardOverviewPage() {
                         {link.click_count} {link.click_count === 1 ? "click" : "clicks"}
                       </span>
                       <button
-                        onClick={() => copyToClipboard(link.short_url, `top-${link.id}`)}
+                        onClick={() => copyToClipboard(getDisplayShortUrl(link.short_code, link.short_url), `top-${link.id}`)}
                         className="p-1 rounded text-slate-400 hover:text-white"
                         title="Copy short link"
                       >

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/auth-context";
+import { getDisplayShortUrl } from "@/lib/utils";
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -50,7 +51,7 @@ export default function LandingPage() {
       const res = await api.createPublicUrl(target);
       setShortenedResult({
         originalUrl: res.original_url,
-        shortUrl: res.short_url,
+        shortUrl: getDisplayShortUrl(res.short_code, res.short_url),
         shortCode: res.short_code,
       });
       setInputUrl("");
