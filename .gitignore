@@ -1,0 +1,74 @@
+# ==============================================================================
+# Environment & Secrets (NEVER COMMIT SENSITIVE FILES)
+# ==============================================================================
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+backend/.env*
+frontend/.env*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Neon CLI internal state
+.neon
+.neon/
+
+# ==============================================================================
+# Database Files & SQLite
+# ==============================================================================
+*.db
+*.sqlite
+*.sqlite3
+linkflow.db
+backend/linkflow.db
+
+# ==============================================================================
+# Dependencies & Package Managers
+# ==============================================================================
+node_modules/
+frontend/node_modules/
+package-lock.json.bak
+pnpm-lock.yaml.bak
+
+# ==============================================================================
+# Build Artifacts & Next.js Caches
+# ==============================================================================
+.next/
+frontend/.next/
+out/
+frontend/out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ==============================================================================
+# Python Virtual Environments, Bytecode & Testing
+# ==============================================================================
+backend/venv/
+venv/
+ENV/
+env/
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+backend/.pytest_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ==============================================================================
+# Operating System & IDE Files
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*.log
