@@ -147,3 +147,4 @@ Copy `.env.example` to `.env.local`:
 - SQL injection prevention via SQLAlchemy 2.0 ORM parameterization.
 - HTTP-only and Secure JWT cookies with CSRF defense.
 - Sensitive environment files (`.env*`, `*.db`) are strictly excluded via `.gitignore`.
+
